@@ -1,8 +1,9 @@
 let poseNet;
 let video;
 let pose;
-let osc;
+let monoSynth;
 var button;
+let scale = ['C4','D4','E4','F4','G4','A4','B4']
 
 function setup() {
   createCanvas(640, 480);
@@ -13,10 +14,8 @@ function setup() {
   poseNet = ml5.poseNet(video, modelLoaded);
   poseNet.on('pose', gotPoses);
 
-  osc = new p5.TriOsc();
-  osc.amp(0.5);
-
-  osc.start();
+  monoSynth = new p5.MonoSynth();
+  monoSynth.connect();
 }
 
 function gotPoses(poses) {
@@ -35,16 +34,16 @@ function draw() {
   if (pose) {
     fill(255);
     noStroke();
-    ellipse(pose.leftEye.x, pose.leftEye.y, 64);
+    ellipse(pose.leftWrist.x, pose.leftWrist.y, 64);
 
-    fill(255);
+    fill(0);
     noStroke();
-    ellipse(pose.rightEye.x, pose.rightEye.y, 64);
+    ellipse(pose.rightWrist.x, pose.rightWrist.y, 64);
 
-    // let freq = map(pose.leftWrist.x, 0, width, 40, 880);
-    // osc.freq(freq);
-  
-    // let amp = map(pose.leftWrist.y, 0, height, 1, 0.01);
-    // osc.amp(amp);
+    let vol = floor(map(pose.leftWrist.y, 0, height, 0, 1));
+    let dur = 1/16;
+    let note = floor(map(pose.rightWrist.y, 0, height, 6, 0));
+
+    monoSynth.play(scale[note], 0.5, 0, dur);
   }
 }
