@@ -11,18 +11,28 @@ function setup() {
   video = createCapture(VIDEO);
   video.hide();
 
+  getAudioContext().suspend();
+
   poseNet = ml5.poseNet(video, modelLoaded);
   poseNet.on('pose', gotPoses);
 
   monoSynth = new p5.MonoSynth();
-  monoSynth.connect();
+  
 }
 
 function gotPoses(poses) {
-  console.log(poses)
   if (poses.length > 0) {
     pose = poses[0].pose;
+    playSound();
   }
+}
+
+function playSound() {
+  let dur = map(pose.leftWrist.y, 0, height, 1/16, 1);
+  print(dur)
+  let note = floor(map(pose.rightWrist.y, 0, height, 6, 0));
+
+  monoSynth.play(scale[note], 0.5, 0, dur);
 }
 
 function modelLoaded() {
@@ -39,11 +49,9 @@ function draw() {
     fill(0);
     noStroke();
     ellipse(pose.rightWrist.x, pose.rightWrist.y, 64);
-
-    let vol = floor(map(pose.leftWrist.y, 0, height, 0, 1));
-    let dur = 1/16;
-    let note = floor(map(pose.rightWrist.y, 0, height, 6, 0));
-
-    monoSynth.play(scale[note], 0.5, 0, dur);
   }
+}
+
+function mousePressed(){
+  userStartAudio();
 }
