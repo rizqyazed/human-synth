@@ -5,4 +5,5 @@ html, body {
 
 canvas {
   display: block;
+  transform: scaleX(-1)
 }

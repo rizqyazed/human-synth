@@ -3,7 +3,7 @@ let video;
 let pose;
 let monoSynth;
 var button;
-let scale = ['C4','D4','E4','F4','G4','A4','B4']
+let scale = ['C4','D4','E4','F4','G4','A4','B4','C5']
 
 function setup() {
   createCanvas(640, 480);
@@ -17,22 +17,23 @@ function setup() {
   poseNet.on('pose', gotPoses);
 
   monoSynth = new p5.MonoSynth();
+  monoSynth.setADSR(0.1, 0.7, 0.3, 0.5)
   
 }
 
 function gotPoses(poses) {
   if (poses.length > 0) {
     pose = poses[0].pose;
+    monoSynth.triggerRelease();
     playSound();
   }
 }
 
 function playSound() {
   let dur = map(pose.leftWrist.y, 0, height, 1/16, 1);
-  print(dur)
-  let note = floor(map(pose.rightWrist.y, 0, height, 6, 0));
+  let note = floor(map(pose.rightWrist.y, 0, height, 7, 0));
 
-  monoSynth.play(scale[note], 0.5, 0, dur);
+  monoSynth.triggerAttack(scale[note], 0.5, 0, dur);
 }
 
 function modelLoaded() {
